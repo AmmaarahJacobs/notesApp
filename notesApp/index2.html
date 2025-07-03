@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notebook Notes App</title>
+  <script src="https://kit.fontawesome.com/60ecdefbcf.js" crossorigin="anonymous"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #fdf6e3;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      border: 2px solid #d8b4a0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #5c3d2e;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      background: #f0c9a4;
+      color: #4e342e;
+      font-weight: bold;
+      font-size: 14px;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .btn:hover {
+      background: #e3a974;
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .notes-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .input-box {
+      position: relative;
+      background: #fffef8;
+      color: #333;
+      min-height: 150px;
+      padding: 20px;
+      border-radius: 10px;
+      outline: none;
+      font-size: 16px;
+      line-height: 1.6;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 28px,
+        #e0dcd4 28px,
+        #e0dcd4 30px
+      );
+      border-left: 4px solid #ffbdbd;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      white-space: pre-wrap;
+    }
+
+    .input-box::before {
+      content: "Start writing...";
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      color: #aaa;
+      pointer-events: none;
+      font-style: italic;
+    }
+
+    .input-box:not(:empty)::before {
+      display: none;
+    }
+
+    .input-box img {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .input-box img:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .btn {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .input-box {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fa-solid fa-book"></i>Notebook</h1>
+    <button class="btn"><i class="fa-solid fa-pen"></i>Create New Page</button>
+    <div class="notes-container"></div>
+  </div>
+
+  <script>
+    const notesContainer = document.querySelector(".notes-container");
+    const createBtn = document.querySelector(".btn");
+
+    function showNotes() {
+      notesContainer.innerHTML = localStorage.getItem("notes") || "";
+    }
+
+    function updateStorage() {
+      localStorage.setItem("notes", notesContainer.innerHTML);
+    }
+
+    createBtn.addEventListener("click", () => {
+      const inputBox = document.createElement("p");
+      const img = document.createElement("img");
+
+      inputBox.className = "input-box";
+      inputBox.setAttribute("contenteditable", "true");
+
+      img.src = "https://cdn-icons-png.flaticon.com/512/6861/6861362.png"; // delete icon
+      img.alt = "Delete Note";
+
+      inputBox.appendChild(img);
+      notesContainer.appendChild(inputBox);
+      inputBox.focus();
+
+      inputBox.addEventListener("keyup", updateStorage);
+    });
+
+    notesContainer.addEventListener("click", (e) => {
+      if (e.target.tagName === "IMG") {
+        e.target.parentElement.remove();
+        updateStorage();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        document.execCommand("insertLineBreak");
+        event.preventDefault();
+      }
+    });
+
+    showNotes();
+
+    // Attach keyup events to restored notes
+    document.querySelectorAll(".input-box").forEach((note) =>
+      note.addEventListener("keyup", updateStorage)
+    );
+  </script>
+</body>
+</html>
